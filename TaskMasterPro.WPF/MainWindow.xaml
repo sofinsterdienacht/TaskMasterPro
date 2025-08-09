@@ -1,0 +1,306 @@
+﻿<Window x:Class="TaskMasterPro.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TaskMasterPro.WPF"
+        xmlns:viewmodels="clr-namespace:TaskMasterPro.WPF.ViewModels"
+        xmlns:converters="clr-namespace:TaskMasterPro.WPF.Converters"
+        mc:Ignorable="d"
+        Title="TaskMaster Pro - Управление задачами" 
+        Height="700" Width="1000"
+        WindowStartupLocation="CenterScreen"
+        Background="#F5F5F5">
+
+    <Window.Resources>
+        <!-- Стили для кнопок -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#2196F3"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#1976D2"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#0D47A1"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Стиль для карточек задач -->
+        <Style x:Key="TaskCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Gray" Direction="270" ShadowDepth="2" Opacity="0.3"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Конвертеры -->
+        <converters:PriorityToColorConverter x:Key="PriorityConverter"/>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок -->
+        <Border Grid.Row="0" Background="#1976D2" Padding="20,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock Text="📋" FontSize="24" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBlock Text="TaskMaster Pro" FontSize="24" FontWeight="Bold" 
+                               Foreground="White" VerticalAlignment="Center"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="🔄 Обновить" Style="{StaticResource ModernButton}"
+                            Command="{Binding LoadTasksCommand}"/>
+                    <Button Content="➕ Добавить" Style="{StaticResource ModernButton}"
+                            Command="{Binding AddTaskCommand}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Основной контент -->
+        <Grid Grid.Row="1" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Список задач -->
+            <Border Grid.Column="0" Background="White" CornerRadius="8" Margin="0,0,10,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Заголовок списка -->
+                    <Border Grid.Row="0" Background="#F8F9FA" Padding="15" 
+                            CornerRadius="8,8,0,0">
+                        <TextBlock Text="Мои задачи" FontSize="18" FontWeight="SemiBold"/>
+                    </Border>
+
+                    <!-- Список задач -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" 
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  PanningMode="VerticalOnly"
+                                  PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+                        <ItemsControl ItemsSource="{Binding Tasks}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource TaskCardStyle}" 
+                                            Margin="10,5"
+                                            MouseLeftButtonUp="TaskCard_Click"
+                                            Tag="{Binding}"
+                                            Cursor="Hand">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Заголовок задачи -->
+                                            <TextBlock Grid.Row="0" Grid.Column="0"
+                                                       Text="{Binding Title}" 
+                                                       FontWeight="SemiBold" 
+                                                       FontSize="16"
+                                                       Margin="0,0,0,5"/>
+
+                                            <!-- Описание -->
+                                            <TextBlock Grid.Row="1" Grid.Column="0"
+                                                       Text="{Binding Description}" 
+                                                       Foreground="#666"
+                                                       TextWrapping="Wrap"
+                                                       Margin="0,0,0,10"/>
+
+                                            <!-- Метаданные -->
+                                            <StackPanel Grid.Row="2" Grid.Column="0" 
+                                                        Orientation="Horizontal">
+                                                <Border Background="{Binding Priority, Converter={StaticResource PriorityConverter}}" 
+                                                        CornerRadius="12" Padding="8,4">
+                                                    <TextBlock Text="{Binding Priority}" 
+                                                               Foreground="White" 
+                                                               FontSize="10" 
+                                                               FontWeight="Bold"/>
+                                                </Border>
+                                                <TextBlock Text="{Binding Status}" 
+                                                           Foreground="#666" 
+                                                           Margin="10,0,0,0" 
+                                                           VerticalAlignment="Center"/>
+                                            </StackPanel>
+
+                                            <!-- Кнопки действий -->
+                                            <StackPanel Grid.Row="0" Grid.Column="1" 
+                                                        Grid.RowSpan="3" 
+                                                        Orientation="Horizontal" 
+                                                        VerticalAlignment="Top">
+                                                <Button Content="✏️" 
+                                                        Style="{StaticResource ModernButton}"
+                                                        Padding="8,4"
+                                                        ToolTip="Редактировать задачу"
+                                                        Click="EditTask_Click"
+                                                        Tag="{Binding}"/>
+                                                <Button Content="🗑️" 
+                                                        Style="{StaticResource ModernButton}"
+                                                        Padding="8,4"
+                                                        Background="#F44336"
+                                                        ToolTip="Удалить задачу"
+                                                        Click="DeleteTask_Click"
+                                                        Tag="{Binding}"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <!-- Панель деталей -->
+            <Border Grid.Column="1" Background="White" CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Заголовок панели -->
+                    <Border Grid.Row="0" Background="#F8F9FA" Padding="15" 
+                            CornerRadius="8,8,0,0">
+                        <TextBlock Text="Детали задачи" FontSize="16" FontWeight="SemiBold"/>
+                    </Border>
+
+                    <!-- Содержимое панели -->
+                    <ScrollViewer Grid.Row="1" Padding="15">
+                        <StackPanel>
+                            <TextBlock Text="Выберите задачу для просмотра деталей" 
+                                       Foreground="#666" 
+                                       TextAlignment="Center" 
+                                       Margin="0,20"
+                                       Visibility="{Binding SelectedTask, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"/>
+                            
+                            <!-- Детали выбранной задачи -->
+                            <StackPanel Visibility="{Binding SelectedTask, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock Text="{Binding SelectedTask.Title}" 
+                                           FontSize="18" FontWeight="Bold" 
+                                           Margin="0,0,0,10"/>
+                                
+                                <TextBlock Text="Описание:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                <TextBlock Text="{Binding SelectedTask.Description}" 
+                                           Foreground="#666" 
+                                           TextWrapping="Wrap" 
+                                           Margin="0,0,0,15"/>
+                                
+                                <Grid Margin="0,0,0,15">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Приоритет:" FontWeight="SemiBold" Margin="0,0,10,5"/>
+                                    <Border Grid.Row="0" Grid.Column="1" Background="{Binding SelectedTask.Priority, Converter={StaticResource PriorityConverter}}" 
+                                            CornerRadius="12" Padding="8,4" HorizontalAlignment="Left" Margin="0,0,0,5">
+                                        <TextBlock Text="{Binding SelectedTask.Priority}" 
+                                                   Foreground="White" 
+                                                   FontSize="10" 
+                                                   FontWeight="Bold"/>
+                                    </Border>
+                                    
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Статус:" FontWeight="SemiBold" Margin="0,0,10,5"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedTask.Status}" 
+                                               Foreground="#666" Margin="0,0,0,5"/>
+                                    
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Создано:" FontWeight="SemiBold" Margin="0,0,10,5"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedTask.CreatedDate, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" 
+                                               Foreground="#666" Margin="0,0,0,5"/>
+                                    
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Срок выполнения:" FontWeight="SemiBold" Margin="0,0,10,5"
+                                               Visibility="{Binding SelectedTask.DueDate, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedTask.DueDate, StringFormat='{}{0:dd.MM.yyyy}'}" 
+                                               Foreground="#666" Margin="0,0,0,5"
+                                               Visibility="{Binding SelectedTask.DueDate, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                    
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="ID задачи:" FontWeight="SemiBold" Margin="0,0,10,5"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SelectedTask.Id}" 
+                                               Foreground="#666" Margin="0,0,0,5"/>
+                                    
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Завершена:" FontWeight="SemiBold" Margin="0,0,10,5"/>
+                                    <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding SelectedTask.IsCompleted}" 
+                                               Foreground="#666" Margin="0,0,0,5"/>
+                                </Grid>
+                                
+                                <!-- Кнопки действий -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                                    <Button Content="✏️ Редактировать" 
+                                            Style="{StaticResource ModernButton}"
+                                            Margin="5,0"
+                                            Click="EditSelectedTask_Click"/>
+                                    <Button Content="🗑️ Удалить" 
+                                            Style="{StaticResource ModernButton}"
+                                            Margin="5,0"
+                                            Background="#F44336"
+                                            Click="DeleteSelectedTask_Click"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Индикатор загрузки -->
+        <Border Grid.Row="1" Background="#80000000" 
+                Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="⏳ Загрузка..." FontSize="18" Foreground="White" 
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
