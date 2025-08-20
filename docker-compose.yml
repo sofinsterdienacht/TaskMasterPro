@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: taskmasterdb
+      POSTGRES_USER: taskuser
+      POSTGRES_PASSWORD: taskpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskuser -d taskmasterdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build:
+      context: .
+      dockerfile: TaskMasterPro/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      DatabaseProvider: Postgres
+      ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=taskmasterdb;Username=taskuser;Password=taskpass
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "5194:8080"
+
+volumes:
+  pgdata:
+
+

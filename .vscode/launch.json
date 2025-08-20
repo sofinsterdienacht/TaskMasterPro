@@ -1,0 +1,49 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (web)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/TaskMasterPro/bin/Debug/net8.0/TaskMasterPro.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/TaskMasterPro",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                 "ASPNETCORE_URLS": "http://localhost:5194"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach"
+        },
+        {
+            "name": "TaskMasterPro WPF",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/TaskMasterPro.WPF/bin/Debug/net8.0-windows/TaskMasterPro.WPF.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/TaskMasterPro.WPF",
+            "stopAtEntry": false,
+            "console": "externalTerminal",
+            "env": {
+                "DOTNET_ENVIRONMENT": "Development"
+            },
+            "requireExactSource": false
+        }
+    ]
+}

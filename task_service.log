@@ -1,0 +1,16 @@
+[2025-08-05 02:09:41] GET http://localhost:5194/api/tasks
+[2025-08-05 02:09:41] Response status: NotFound
+[2025-08-05 02:09:41] Error getting tasks: Response status code does not indicate success: 404 (Not Found).
+[2025-08-05 02:09:41] Full error: System.Net.Http.HttpRequestException: Response status code does not indicate success: 404 (Not Found).
+   at System.Net.Http.HttpResponseMessage.EnsureSuccessStatusCode()
+   at TaskMasterPro.WPF.Services.TaskService.GetAllTasksAsync() in C:\Users\Midori\RiderProjects\TaskMasterPro\TaskMasterPro.WPF\Services\TaskService.cs:line 44
+[2025-08-05 02:10:43] POST http://localhost:5194/api/tasks
+[2025-08-05 02:10:43] JSON to send: {"Id":0,"Title":"\u0443\u043A\u0443\u043A\u0443\u0435","Description":"\u0435\u0443\u0446\u0435","CreatedDate":"2025-08-05T02:10:43.8101879+03:00","DueDate":null,"Priority":1,"Status":0,"IsCompleted":false}
+[2025-08-05 02:10:43] Response status: NotFound
+[2025-08-05 02:10:43] Error response: 
+[2025-08-05 02:10:48] GET http://localhost:5194/api/tasks
+[2025-08-05 02:10:48] Response status: NotFound
+[2025-08-05 02:10:48] Error getting tasks: Response status code does not indicate success: 404 (Not Found).
+[2025-08-05 02:10:48] Full error: System.Net.Http.HttpRequestException: Response status code does not indicate success: 404 (Not Found).
+   at System.Net.Http.HttpResponseMessage.EnsureSuccessStatusCode()
+   at TaskMasterPro.WPF.Services.TaskService.GetAllTasksAsync() in C:\Users\Midori\RiderProjects\TaskMasterPro\TaskMasterPro.WPF\Services\TaskService.cs:line 44

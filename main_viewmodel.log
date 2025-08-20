@@ -1,0 +1,12 @@
+[2025-08-05 02:09:41] LoadTasksAsync started
+[2025-08-05 02:09:41] Loaded 0 tasks
+[2025-08-05 02:09:41] LoadTasksAsync completed
+[2025-08-05 02:10:37] AddTaskAsync started
+[2025-08-05 02:10:42] User entered title: укукуе
+[2025-08-05 02:10:43] User entered description: еуце
+[2025-08-05 02:10:43] Created task object: укукуе
+[2025-08-05 02:10:43] Create task result: False
+[2025-08-05 02:10:43] Failed to create task
+[2025-08-05 02:10:48] LoadTasksAsync started
+[2025-08-05 02:10:48] Loaded 0 tasks
+[2025-08-05 02:10:48] LoadTasksAsync completed

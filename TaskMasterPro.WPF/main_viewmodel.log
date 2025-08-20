@@ -1,0 +1,36 @@
+[2025-08-13 02:21:10] InitializeAsync started
+[2025-08-13 02:21:10] LoadCategoriesAndPrioritiesAsync started
+[2025-08-13 02:21:10] Loaded 6 categories and 4 priorities
+[2025-08-13 02:21:10] LoadTasksAsync started
+[2025-08-13 02:21:11] Loaded 4 tasks
+[2025-08-13 02:21:11] InitializeAsync completed
+[2025-08-13 02:21:14] LoadTasksAsync started
+[2025-08-13 02:21:14] Loaded 4 tasks
+[2025-08-13 02:21:37] LoadTasksAsync started
+[2025-08-13 02:21:37] Loaded 4 tasks
+[2025-08-13 02:21:41] LoadTasksAsync started
+[2025-08-13 02:21:41] Loaded 4 tasks
+[2025-08-13 02:22:26] LoadTasksAsync started
+[2025-08-13 02:22:26] Loaded 5 tasks
+[2025-08-13 02:22:33] LoadTasksAsync started
+[2025-08-13 02:22:33] Loaded 5 tasks
+[2025-08-13 02:50:57] InitializeAsync started
+[2025-08-13 02:50:57] LoadCategoriesAndPrioritiesAsync started
+[2025-08-13 02:50:57] Loaded 6 categories and 4 priorities
+[2025-08-13 02:50:57] LoadTasksAsync started
+[2025-08-13 02:51:00] Loaded 5 tasks
+[2025-08-13 02:51:00] InitializeAsync completed
+[2025-08-13 02:51:19] LoadTasksAsync started
+[2025-08-13 02:51:19] Loaded 5 tasks
+[2025-08-13 03:16:14] InitializeAsync started
+[2025-08-13 03:16:14] LoadCategoriesAndPrioritiesAsync started
+[2025-08-13 03:16:15] Loaded 6 categories and 4 priorities
+[2025-08-13 03:16:15] LoadTasksAsync started
+[2025-08-13 03:16:19] Loaded 5 tasks
+[2025-08-13 03:16:19] InitializeAsync completed
+[2025-08-13 03:29:28] InitializeAsync started
+[2025-08-13 03:29:28] LoadCategoriesAndPrioritiesAsync started
+[2025-08-13 03:29:29] Loaded 6 categories and 4 priorities
+[2025-08-13 03:29:29] LoadTasksAsync started
+[2025-08-13 03:29:30] Loaded 5 tasks
+[2025-08-13 03:29:30] InitializeAsync completed

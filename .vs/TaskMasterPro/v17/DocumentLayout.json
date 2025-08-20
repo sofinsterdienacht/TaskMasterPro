@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Midori\\RiderProjects\\TaskMasterPro\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{1CFF926E-005D-421E-9137-4B903D4A5D1E}|TaskMasterPro\\TaskMasterPro.csproj|c:\\users\\midori\\riderprojects\\taskmasterpro\\taskmasterpro\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1CFF926E-005D-421E-9137-4B903D4A5D1E}|TaskMasterPro\\TaskMasterPro.csproj|solutionrelative:taskmasterpro\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Midori\\RiderProjects\\TaskMasterPro\\TaskMasterPro\\Program.cs",
+              "RelativeDocumentMoniker": "TaskMasterPro\\Program.cs",
+              "ToolTip": "C:\\Users\\Midori\\RiderProjects\\TaskMasterPro\\TaskMasterPro\\Program.cs",
+              "RelativeToolTip": "TaskMasterPro\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-04T12:10:57.53Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

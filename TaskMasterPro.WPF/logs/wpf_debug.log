@@ -1,0 +1,11 @@
+[2025-08-13 02:21:43] AddTaskAsync вызван
+[2025-08-13 02:21:43] Показываю InputBox для названия
+[2025-08-13 02:22:03] User entered title: Зодиак важно!
+[2025-08-13 02:22:03] Показываю InputBox для описания
+[2025-08-13 02:22:05] User entered description: Сделать построчный скрин Зодиака
+[2025-08-13 02:22:22] User selected category: Study
+[2025-08-13 02:22:25] User selected priority: Medium
+[2025-08-13 02:22:25] Создан TaskItem: Зодиак важно!
+[2025-08-13 02:22:25] Пробую вызвать _taskService.CreateTaskAsync
+[2025-08-13 02:22:25] CreateTaskAsync вернул: True
+[2025-08-13 02:22:26] Задача успешно создана, вызываю LoadTasksAsync

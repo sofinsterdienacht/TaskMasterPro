@@ -1,0 +1,31 @@
+<Window x:Class="TaskMasterPro.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="TaskMaster Pro" Height="600" Width="1000"
+        WindowStartupLocation="CenterScreen">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Заголовок -->
+        <Border Grid.Row="0" Background="LightBlue" Padding="16">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="TaskMaster Pro" 
+                          FontSize="20" 
+                          FontWeight="Bold"
+                          VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Основное содержимое -->
+        <Grid Grid.Row="1" Margin="16">
+            <TextBlock Text="Здесь будет список задач" 
+                      HorizontalAlignment="Center" 
+                      VerticalAlignment="Center"
+                      FontSize="16"/>
+        </Grid>
+    </Grid>
+</Window> 
