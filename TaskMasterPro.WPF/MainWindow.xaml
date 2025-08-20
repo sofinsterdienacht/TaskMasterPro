@@ -87,6 +87,8 @@
                             Command="{Binding LoadTasksCommand}"/>
                     <Button Content="➕ Добавить" Style="{StaticResource ModernButton}"
                             Command="{Binding AddTaskCommand}"/>
+                    <Button Content="📊 Статистика" Style="{StaticResource ModernButton}"
+                            Command="{Binding StatisticsCommand}"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -163,6 +165,14 @@
                                                 <TextBlock Text="{Binding Status}" 
                                                            Foreground="#666" 
                                                            Margin="10,0,0,0" 
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Text=", Категория: "
+                                                           Foreground="#666"
+                                                           Margin="10,0,0,0"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Text="{Binding Category}"
+                                                           Foreground="#333"
+                                                           Margin="2,0,0,0"
                                                            VerticalAlignment="Center"/>
                                             </StackPanel>
 
@@ -274,16 +284,25 @@
                                     <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding SelectedTask.IsCompleted}" 
                                                Foreground="#666" Margin="0,0,0,5"/>
                                 </Grid>
+
+                                <!-- Категория (для явной видимости) -->
+                                <TextBlock Text="Категория:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                <TextBlock Text="{Binding SelectedTask.Category}" Foreground="#666" Margin="0,0,0,15"/>
                                 
                                 <!-- Кнопки действий -->
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,10,0,0">
                                     <Button Content="✏️ Редактировать" 
                                             Style="{StaticResource ModernButton}"
-                                            Margin="5,0"
+                                            Margin="5,5"
                                             Click="EditSelectedTask_Click"/>
+                                    <Button Content="✔ Выполнить" 
+                                            Style="{StaticResource ModernButton}"
+                                            Margin="5,5"
+                                            Background="#4CAF50"
+                                            Click="CompleteSelectedTask_Click"/>
                                     <Button Content="🗑️ Удалить" 
                                             Style="{StaticResource ModernButton}"
-                                            Margin="5,0"
+                                            Margin="5,5"
                                             Background="#F44336"
                                             Click="DeleteSelectedTask_Click"/>
                                 </StackPanel>

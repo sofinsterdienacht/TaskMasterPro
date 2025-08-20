@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Controls;
 using TaskMasterPro.WPF.ViewModels;
 using TaskMasterPro.WPF.Models;
+using TaskMasterPro.WPF.Dialogs;
 
 namespace TaskMasterPro.WPF
 {
@@ -135,7 +136,8 @@ namespace TaskMasterPro.WPF
         {
             try
             {
-                var taskService = new TaskMasterPro.WPF.Services.TaskService();
+                var configurationService = new TaskMasterPro.WPF.Services.ConfigurationService();
+                var taskService = new TaskMasterPro.WPF.Services.TaskService(configurationService);
                 var success = await taskService.UpdateTaskAsync(task);
                 
                 if (success)
@@ -166,13 +168,12 @@ namespace TaskMasterPro.WPF
         {
             try
             {
-                var taskService = new TaskMasterPro.WPF.Services.TaskService();
+                var configurationService = new TaskMasterPro.WPF.Services.ConfigurationService();
+                var taskService = new TaskMasterPro.WPF.Services.TaskService(configurationService);
                 var success = await taskService.DeleteTaskAsync(task.Id);
                 
                 if (success)
                 {
-                    MessageBox.Show("Задача успешно удалена!", "Успех", 
-                        MessageBoxButton.OK, MessageBoxImage.Information);
                     // Сбрасываем выбранную задачу если она была удалена
                     if (viewModel.SelectedTask?.Id == task.Id)
                     {
@@ -208,6 +209,34 @@ namespace TaskMasterPro.WPF
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка при обновлении списка: {ex.Message}", "Ошибка", 
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // Выполнить выбранную задачу
+        private async void CompleteSelectedTask_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (DataContext is MainViewModel viewModel && viewModel.SelectedTask != null)
+                {
+                    var configurationService = new TaskMasterPro.WPF.Services.ConfigurationService();
+                    var taskService = new TaskMasterPro.WPF.Services.TaskService(configurationService);
+                    var success = await taskService.CompleteTaskAsync(viewModel.SelectedTask.Id);
+                    if (success)
+                    {
+                        await RefreshTasks(viewModel);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Не удалось завершить задачу.", "Ошибка", 
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при завершении задачи: {ex.Message}", "Ошибка", 
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

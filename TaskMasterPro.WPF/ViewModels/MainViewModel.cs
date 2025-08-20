@@ -8,55 +8,64 @@ using System.Windows.Input;
 using TaskMasterPro.WPF.Models;
 using TaskMasterPro.WPF.Services;
 using System.Windows;
+using System.Collections.Generic;
+using System.Linq;
+using TaskMasterPro.WPF.Dialogs;
 
 namespace TaskMasterPro.WPF.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
         private readonly TaskService _taskService;
+        private readonly CategoryService _categoryService;
+        private readonly ConfigurationService _configurationService;
         private TaskItem? _selectedTask;
         private bool _isLoading;
-        private readonly string _logFile = "main_viewmodel.log";
-        private readonly string _debugLogFile = Path.Combine("logs", "wpf_debug.log");
+        
+        
+        private List<string> _availableCategories = new List<string>();
+        private List<string> _availablePriorities = new List<string>();
 
         public MainViewModel()
         {
-            _taskService = new TaskService();
+            _configurationService = new ConfigurationService();
+            
+            _taskService = new TaskService(_configurationService);
+            _categoryService = new CategoryService(_configurationService);
             Tasks = new ObservableCollection<TaskItem>();
             
             LoadTasksCommand = new RelayCommand(async () => await LoadTasksAsync());
             AddTaskCommand = new RelayCommand(async () => await AddTaskAsync());
             DeleteTaskCommand = new RelayCommand(async () => await DeleteTaskAsync());
+            StatisticsCommand = new RelayCommand(async () => await ShowStatisticsAsync());
             
-            // Загружаем задачи при запуске
-            _ = LoadTasksAsync();
+            // Загружаем задачи и категории при запуске
+            _ = InitializeAsync();
         }
 
-        private void LogMessage(string message)
-        {
-            try
-            {
-                var logEntry = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}";
-                File.AppendAllText(_logFile, logEntry + Environment.NewLine);
-            }
-            catch
-            {
-                // Игнорируем ошибки логирования
-            }
-        }
-
-        private void DebugLog(string message)
-        {
-            try
-            {
-                Directory.CreateDirectory("logs");
-                var logEntry = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}";
-                File.AppendAllText(_debugLogFile, logEntry + Environment.NewLine);
-            }
-            catch { }
-        }
+        
 
         public ObservableCollection<TaskItem> Tasks { get; }
+        
+        public List<string> AvailableCategories
+        {
+            get => _availableCategories;
+            private set
+            {
+                _availableCategories = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        public List<string> AvailablePriorities
+        {
+            get => _availablePriorities;
+            private set
+            {
+                _availablePriorities = value;
+                OnPropertyChanged();
+            }
+        }
 
         public TaskItem? SelectedTask
         {
@@ -81,15 +90,57 @@ namespace TaskMasterPro.WPF.ViewModels
         public ICommand LoadTasksCommand { get; }
         public ICommand AddTaskCommand { get; }
         public ICommand DeleteTaskCommand { get; }
+        public ICommand StatisticsCommand { get; }
 
-        private async Task LoadTasksAsync()
+        private async Task InitializeAsync()
         {
-            LogMessage("LoadTasksAsync started");
+            
             IsLoading = true;
             try
             {
+                // Загружаем категории и приоритеты
+                await LoadCategoriesAndPrioritiesAsync();
+                
+                // Загружаем задачи
+                await LoadTasksAsync();
+            }
+            catch (Exception ex)
+            {
+                
+                MessageBox.Show($"Ошибка инициализации: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsLoading = false;
+                
+            }
+        }
+        
+        private async Task LoadCategoriesAndPrioritiesAsync()
+        {
+            try
+            {
+                var enumValues = await _categoryService.GetAllEnumValuesAsync();
+                
+                AvailableCategories = enumValues.Categories;
+                AvailablePriorities = enumValues.Priorities;
+                
+            }
+            catch (Exception ex)
+            {
+                
+                // Устанавливаем значения по умолчанию из перечислений
+                AvailableCategories = Enum.GetNames(typeof(TaskCategory)).ToList();
+                AvailablePriorities = Enum.GetNames(typeof(TaskPriority)).ToList();
+            }
+        }
+        
+        private async Task LoadTasksAsync()
+        {
+            
+            try
+            {
                 var tasks = await _taskService.GetAllTasksAsync();
-                LogMessage($"Loaded {tasks.Count} tasks");
                 Tasks.Clear();
                 foreach (var task in tasks)
                 {
@@ -98,75 +149,102 @@ namespace TaskMasterPro.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                LogMessage($"Error in LoadTasksAsync: {ex.Message}");
-                LogMessage($"Full error: {ex}");
+                
                 MessageBox.Show($"Ошибка загрузки задач: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            finally
-            {
-                IsLoading = false;
-                LogMessage("LoadTasksAsync completed");
             }
         }
 
         private async Task AddTaskAsync()
         {
-            DebugLog("AddTaskAsync вызван");
             try
             {
-                DebugLog("Показываю InputBox для названия");
                 var taskTitle = Microsoft.VisualBasic.Interaction.InputBox(
                     "Введите название задачи:",
                     "Новая задача",
                     "Новая задача");
-                DebugLog($"User entered title: {taskTitle}");
                 if (string.IsNullOrWhiteSpace(taskTitle))
                 {
-                    DebugLog("User cancelled or entered empty title");
                     return;
                 }
-                DebugLog("Показываю InputBox для описания");
+                
                 var taskDescription = Microsoft.VisualBasic.Interaction.InputBox(
                     "Введите описание задачи:",
                     "Описание задачи",
                     "Описание задачи");
-                DebugLog($"User entered description: {taskDescription}");
+                
+                // Пытаемся автоматически определить категорию по ключевым словам
+                string selectedCategory;
+                try
+                {
+                    var categoriesKeywords = await _categoryService.GetAllCategoriesAsync();
+                    var lowerTitle = taskTitle.ToLower();
+                    var inferred = categoriesKeywords
+                        .Select(kvp => new { Name = kvp.Key, Match = kvp.Value.Any(k => lowerTitle.Contains(k)) })
+                        .FirstOrDefault(x => x.Match)?.Name;
+
+                    if (!string.IsNullOrWhiteSpace(inferred) && AvailableCategories.Contains(inferred))
+                    {
+                        selectedCategory = inferred;
+                        
+                    }
+                    else
+                    {
+                        // Выбор категории из выпадающего списка
+                        var dialog = new CategorySelectDialog(AvailableCategories);
+                        var owner = Application.Current?.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
+                        if (owner != null) dialog.Owner = owner;
+                        var ok = dialog.ShowDialog() == true;
+                        selectedCategory = ok && !string.IsNullOrWhiteSpace(dialog.SelectedCategory)
+                            ? dialog.SelectedCategory!
+                            : (AvailableCategories.FirstOrDefault() ?? "Personal");
+                        
+                    }
+                }
+                catch (Exception ex)
+                {
+                    
+                    var dialog = new CategorySelectDialog(AvailableCategories);
+                    var owner = Application.Current?.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
+                    if (owner != null) dialog.Owner = owner;
+                    var ok = dialog.ShowDialog() == true;
+                    selectedCategory = ok && !string.IsNullOrWhiteSpace(dialog.SelectedCategory)
+                        ? dialog.SelectedCategory!
+                        : (AvailableCategories.FirstOrDefault() ?? "Personal");
+                }
+                
+                // Приоритет не спрашиваем у пользователя: backend определит по ключевым словам; локально ставим Medium
+                var selectedPriority = "Medium";
+                
+                
                 var newTask = new TaskItem
                 {
                     Title = taskTitle,
                     Description = string.IsNullOrEmpty(taskDescription) ? "Описание задачи" : taskDescription,
                     CreatedDate = DateTime.Now,
-                    Priority = TaskPriority.Medium,
+                    Priority = Enum.Parse<TaskPriority>(selectedPriority),
+                    Category = Enum.Parse<TaskCategory>(selectedCategory),
                     Status = TaskItemStatus.ToDo,
                     IsCompleted = false
                 };
-                DebugLog($"Создан TaskItem: {newTask.Title}");
                 bool success = false;
                 try
                 {
-                    DebugLog("Пробую вызвать _taskService.CreateTaskAsync");
                     success = await _taskService.CreateTaskAsync(newTask);
-                    DebugLog($"CreateTaskAsync вернул: {success}");
+                    
                 }
                 catch (Exception ex)
                 {
-                    DebugLog($"Exception в CreateTaskAsync: {ex.Message}");
+                    
                 }
-                MessageBox.Show(success ? "Задача успешно создана!" : "Не удалось создать задачу.");
                 if (success)
                 {
-                    DebugLog("Задача успешно создана, вызываю LoadTasksAsync");
                     await LoadTasksAsync();
-                    MessageBox.Show($"Загружено задач: {Tasks.Count}");
                 }
-                else
-                {
-                    DebugLog("Не удалось создать задачу");
-                }
+                
             }
             catch (Exception ex)
             {
-                DebugLog($"Exception в AddTaskAsync: {ex.Message}");
+                
             }
         }
 
@@ -181,20 +259,51 @@ namespace TaskMasterPro.WPF.ViewModels
                 
                 if (result == MessageBoxResult.Yes)
                 {
-                    LogMessage($"DeleteTaskAsync for task {SelectedTask.Id}");
                     var success = await _taskService.DeleteTaskAsync(SelectedTask.Id);
-                    LogMessage($"Delete task result: {success}");
                     if (success)
                     {
                         await LoadTasksAsync();
                         SelectedTask = null;
-                        MessageBox.Show("Задача успешно удалена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     else
                     {
                         MessageBox.Show("Не удалось удалить задачу.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
+            }
+        }
+
+        private async Task ShowStatisticsAsync()
+        {
+            try
+            {
+                var totalTasks = Tasks.Count;
+                var completedTasks = Tasks.Count(t => t.IsCompleted);
+                var pendingTasks = totalTasks - completedTasks;
+                var completionRate = totalTasks > 0 ? (double)completedTasks / totalTasks * 100 : 0;
+
+                var categoryStats = Tasks.GroupBy(t => t.Category)
+                    .Select(g => $"{g.Key}: {g.Count()} задач")
+                    .ToList();
+
+                var priorityStats = Tasks.GroupBy(t => t.Priority)
+                    .Select(g => $"{g.Key}: {g.Count()} задач")
+                    .ToList();
+
+                var statsMessage = $"📊 СТАТИСТИКА ЗАДАЧ\n\n" +
+                                 $"Всего задач: {totalTasks}\n" +
+                                 $"Завершено: {completedTasks}\n" +
+                                 $"В работе: {pendingTasks}\n" +
+                                 $"Процент выполнения: {completionRate:F1}%\n\n" +
+                                 $"📂 ПО КАТЕГОРИЯМ:\n{string.Join("\n", categoryStats)}\n\n" +
+                                 $"⚡ ПО ПРИОРИТЕТАМ:\n{string.Join("\n", priorityStats)}";
+
+                MessageBox.Show(statsMessage, "Статистика задач", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                
+                MessageBox.Show($"Ошибка при загрузке статистики: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

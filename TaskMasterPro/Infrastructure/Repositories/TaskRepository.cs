@@ -26,17 +26,20 @@ public class TaskRepository : ITaskRepository
 
     public async Task<IEnumerable<TaskItem>> GetByPriorityAsync(TaskPriority priority)
     {
-        return await _context.Tasks.Where(t => t.Priority == priority).ToListAsync();
+        var priorityId = (int)priority;
+        return await _context.Tasks.Where(t => t.PriorityId == priorityId).ToListAsync();
     }
 
     public async Task<IEnumerable<TaskItem>> GetByStatusAsync(TaskItemStatus status)
     {
-        return await _context.Tasks.Where(t => t.Status == status).ToListAsync();
+        var statusId = (int)status;
+        return await _context.Tasks.Where(t => t.StatusId == statusId).ToListAsync();
     }
 
     public async Task<IEnumerable<TaskItem>> GetByCategoryAsync(TaskCategory category)
     {
-        return await _context.Tasks.Where(t => t.Category == category).ToListAsync();
+        var categoryId = (int)category;
+        return await _context.Tasks.Where(t => t.CategoryId == categoryId).ToListAsync();
     }
 
     public async Task<TaskItem> AddAsync(TaskItem task)
@@ -65,16 +68,19 @@ public class TaskRepository : ITaskRepository
 
     public async Task<int> GetCompletedTasksCountAsync()
     {
-        return await _context.Tasks.CountAsync(t => t.Status == TaskItemStatus.Completed);
+        var completedId = (int)TaskItemStatus.Completed;
+        return await _context.Tasks.CountAsync(t => t.StatusId == completedId);
     }
 
     public async Task<int> GetPendingTasksCountAsync()
     {
-        return await _context.Tasks.CountAsync(t => t.Status == TaskItemStatus.Pending);
+        var pendingId = (int)TaskItemStatus.Pending;
+        return await _context.Tasks.CountAsync(t => t.StatusId == pendingId);
     }
     
     public async Task<int> GetInProgressTasksCountAsync()
     {
-        return await _context.Tasks.CountAsync(t => t.Status == TaskItemStatus.InProgress);
+        var inProgressId = (int)TaskItemStatus.InProgress;
+        return await _context.Tasks.CountAsync(t => t.StatusId == inProgressId);
     }
 }

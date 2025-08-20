@@ -9,10 +9,12 @@ namespace TaskMasterPro.Core.Services;
 public class TaskService : ITaskService
 {
     private readonly ITaskRepository _taskRepository;
+    private readonly ICategoryService _categoryService;
 
-    public TaskService(ITaskRepository taskRepository)
+    public TaskService(ITaskRepository taskRepository, ICategoryService categoryService)
     {
         _taskRepository = taskRepository;
+        _categoryService = categoryService;
     }
 
     public async Task<IEnumerable<TaskItem>> GetAllTasksAsync()
@@ -110,46 +112,11 @@ public class TaskService : ITaskService
 
     private TaskPriority DeterminePriority(string title)
     {
-        var lowerTitle = title.ToLower();
-        
-        if (lowerTitle.Contains("срочно") || lowerTitle.Contains("urgent") || 
-            lowerTitle.Contains("критично") || lowerTitle.Contains("важно"))
-            return TaskPriority.High;
-        
-        if (lowerTitle.Contains("не важно") || lowerTitle.Contains("потом"))
-            return TaskPriority.Low;
-        
-        return TaskPriority.Medium;
+        return _categoryService.DeterminePriority(title);
     }
 
     private TaskCategory DetermineCategory(string title)
     {
-        var lowerTitle = title.ToLower();
-        
-        if (lowerTitle.Contains("работ") || lowerTitle.Contains("work") || 
-            lowerTitle.Contains("проект") || lowerTitle.Contains("клиент") ||
-            lowerTitle.Contains("презентац") || lowerTitle.Contains("presentation") ||
-            lowerTitle.Contains("отчет") || lowerTitle.Contains("report") ||
-            lowerTitle.Contains("совещан") || lowerTitle.Contains("meeting") ||
-            lowerTitle.Contains("конференц") || lowerTitle.Contains("conference"))
-            return TaskCategory.Work;
-        
-        if (lowerTitle.Contains("учеб") || lowerTitle.Contains("study") || 
-            lowerTitle.Contains("экзамен") || lowerTitle.Contains("курс"))
-            return TaskCategory.Study;
-        
-        if (lowerTitle.Contains("здоров") || lowerTitle.Contains("health") || 
-            lowerTitle.Contains("врач") || lowerTitle.Contains("спорт"))
-            return TaskCategory.Health;
-        
-        if (lowerTitle.Contains("денег") || lowerTitle.Contains("finance") || 
-            lowerTitle.Contains("бюджет") || lowerTitle.Contains("счет"))
-            return TaskCategory.Finance;
-        
-        if (lowerTitle.Contains("покуп") || lowerTitle.Contains("shopping") || 
-            lowerTitle.Contains("купи") || lowerTitle.Contains("магазин"))
-            return TaskCategory.Shopping;
-        
-        return TaskCategory.Personal;
+        return _categoryService.DetermineCategory(title);
     }
 }

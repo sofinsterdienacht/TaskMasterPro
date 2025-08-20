@@ -12,39 +12,31 @@ namespace TaskMasterPro.WPF.Services
     public class TaskService
     {
         private readonly HttpClient _httpClient;
-        private readonly string _baseUrl = "http://localhost:5194/api/tasks";
-        private readonly string _logFile = "task_service.log";
+        private readonly string _baseUrl;
+        
 
-        public TaskService()
+        public TaskService(ConfigurationService configurationService)
         {
+            var apiSettings = configurationService.GetApiSettings();
+            var loggingSettings = configurationService.GetLoggingSettings();
+            
+            _baseUrl = $"{apiSettings.BaseUrl}{apiSettings.TasksEndpoint}";
+            
             _httpClient = new HttpClient();
         }
 
-        private void LogMessage(string message)
-        {
-            try
-            {
-                var logEntry = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}";
-                File.AppendAllText(_logFile, logEntry + Environment.NewLine);
-            }
-            catch
-            {
-                // Игнорируем ошибки логирования
-            }
-        }
+        
 
         public async Task<List<TaskItem>> GetAllTasksAsync()
 {
     try
     {
-        LogMessage($"GET {_baseUrl}");
         var response = await _httpClient.GetAsync(_baseUrl);
-        LogMessage($"Response status: {response.StatusCode}");
+        
         
         response.EnsureSuccessStatusCode();
         
         var content = await response.Content.ReadAsStringAsync();
-        LogMessage($"Response content: {content}");
         
         // Десериализуем в List<JsonElement> сначала
         var tasksData = JsonSerializer.Deserialize<List<JsonElement>>(content, new JsonSerializerOptions
@@ -68,23 +60,22 @@ namespace TaskMasterPro.WPF.Services
                         : null,
                     Priority = ParsePriority(taskData.GetProperty("priority").GetString() ?? "Medium"),
                     Status = ParseStatus(taskData.GetProperty("status").GetString() ?? "Pending"),
+                    Category = ParseCategory(taskData.GetProperty("category").GetString() ?? "Personal"),
                     IsCompleted = taskData.GetProperty("status").GetString() == "Completed"
                 };
                 tasks.Add(task);
             }
             catch (Exception ex)
             {
-                LogMessage($"Error parsing task: {ex.Message}");
+                
             }
         }
         
-        LogMessage($"Successfully parsed {tasks.Count} tasks");
         return tasks;
     }
     catch (Exception ex)
     {
-        LogMessage($"Error getting tasks: {ex.Message}");
-        LogMessage($"Full error: {ex}");
+        
         return new List<TaskItem>();
     }
 }
@@ -113,19 +104,31 @@ private TaskItemStatus ParseStatus(string status)
     };
 }
 
+private TaskCategory ParseCategory(string category)
+{
+    return category.ToLower() switch
+    {
+        "personal" => TaskCategory.Personal,
+        "work" => TaskCategory.Work,
+        "study" => TaskCategory.Study,
+        "health" => TaskCategory.Health,
+        "finance" => TaskCategory.Finance,
+        "shopping" => TaskCategory.Shopping,
+        _ => TaskCategory.Personal
+    };
+}
+
         public async Task<TaskItem?> GetTaskByIdAsync(int id)
         {
             try
             {
                 var url = $"{_baseUrl}/{id}";
-                LogMessage($"GET {url}");
                 var response = await _httpClient.GetAsync(url);
-                LogMessage($"Response status: {response.StatusCode}");
+                
                 
                 response.EnsureSuccessStatusCode();
                 
                 var content = await response.Content.ReadAsStringAsync();
-                LogMessage($"Response content: {content}");
                 
                 return JsonSerializer.Deserialize<TaskItem>(content, new JsonSerializerOptions
                 {
@@ -134,8 +137,7 @@ private TaskItemStatus ParseStatus(string status)
             }
             catch (Exception ex)
             {
-                LogMessage($"Error getting task {id}: {ex.Message}");
-                LogMessage($"Full error: {ex}");
+                
                 return null;
             }
         }
@@ -154,30 +156,17 @@ private TaskItemStatus ParseStatus(string status)
                 };
         
                 var json = JsonSerializer.Serialize(createTaskDto);
-                LogMessage($"POST {_baseUrl}");
-                LogMessage($"JSON to send: {json}");
+                
         
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(_baseUrl, content);
         
-                LogMessage($"Response status: {response.StatusCode}");
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    LogMessage($"Error response: {errorContent}");
-                }
-                else
-                {
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    LogMessage($"Success response: {responseContent}");
-                }
         
                 return response.IsSuccessStatusCode;
             }
             catch (Exception ex)
             {
-                LogMessage($"Error creating task: {ex.Message}");
-                LogMessage($"Full error: {ex}");
+                
                 return false;
             }
         }
@@ -198,19 +187,16 @@ private TaskItemStatus ParseStatus(string status)
 
                 var json = JsonSerializer.Serialize(updateTaskDto);
                 var url = $"{_baseUrl}/{task.Id}";
-                LogMessage($"PUT {url}");
-                LogMessage($"JSON to send: {json}");
+                
                 
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
                 var response = await _httpClient.PutAsync(url, content);
                 
-                LogMessage($"Response status: {response.StatusCode}");
                 return response.IsSuccessStatusCode;
             }
             catch (Exception ex)
             {
-                LogMessage($"Error updating task: {ex.Message}");
-                LogMessage($"Full error: {ex}");
+                
                 return false;
             }
         }
@@ -220,17 +206,28 @@ private TaskItemStatus ParseStatus(string status)
             try
             {
                 var url = $"{_baseUrl}/{id}";
-                LogMessage($"DELETE {url}");
-                
                 var response = await _httpClient.DeleteAsync(url);
-                LogMessage($"Response status: {response.StatusCode}");
                 
                 return response.IsSuccessStatusCode;
             }
             catch (Exception ex)
             {
-                LogMessage($"Error deleting task {id}: {ex.Message}");
-                LogMessage($"Full error: {ex}");
+                
+                return false;
+            }
+        }
+
+        public async Task<bool> CompleteTaskAsync(int id)
+        {
+            try
+            {
+                var url = $"{_baseUrl}/{id}/complete";
+                var response = await _httpClient.PostAsync(url, new StringContent("{}", Encoding.UTF8, "application/json"));
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                
                 return false;
             }
         }
