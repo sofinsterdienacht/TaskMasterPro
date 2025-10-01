@@ -25,7 +25,7 @@ namespace TaskMasterPro.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
-                });
+                }); 
 
             migrationBuilder.CreateTable(
                 name: "Priorities",
