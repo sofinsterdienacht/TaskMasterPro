@@ -18,7 +18,7 @@ public class TaskDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Конфигурация для TaskItem
+
         modelBuilder.Entity<TaskItem>(entity =>
         {
             entity.HasKey(e => e.Id);

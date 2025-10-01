@@ -8,10 +8,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace TaskMasterPro.Migrations
 {
-    /// <inheritdoc />
+
+
     public partial class InitialCreate_Postgres : Migration
     {
-        /// <inheritdoc />
+
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(

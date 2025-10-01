@@ -37,8 +37,8 @@ namespace TaskMasterPro.WPF.Services
         response.EnsureSuccessStatusCode();
         
         var content = await response.Content.ReadAsStringAsync();
-        
-        // Десериализуем в List<JsonElement> сначала
+
+
         var tasksData = JsonSerializer.Deserialize<List<JsonElement>>(content, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
@@ -146,7 +146,8 @@ private TaskCategory ParseCategory(string category)
         {
             try
             {
-                // Отправляем только те поля, которые ожидает API
+
+
                 var createTaskDto = new
                 {
                     Title = task.Title,
@@ -175,7 +176,8 @@ private TaskCategory ParseCategory(string category)
         {
             try
             {
-                // Создаем DTO для обновления
+
+
                 var updateTaskDto = new
                 {
                     Title = task.Title,

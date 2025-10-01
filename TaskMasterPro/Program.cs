@@ -7,17 +7,17 @@ using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Register our services
+
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 
-// Database provider selection via configuration
+
 var dbProvider = builder.Configuration["DatabaseProvider"] ?? "SqlServer";
 builder.Services.AddDbContext<TaskDbContext>(options =>
 {
@@ -45,15 +45,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Убираем HTTPS редирект, который может вызывать проблемы
-// app.UseHttpsRedirection();
+
+
+
 app.UseAuthorization();
 app.MapControllers();
 
-// Добавляем простой тестовый endpoint
+
 app.MapGet("/test", () => "API работает!");
 
-// Apply migrations automatically on startup
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<TaskDbContext>();

@@ -11,17 +11,17 @@ public class TaskItem
     public string Title { get; set; } = string.Empty;
     public string? Description { get; set; }
 
-    // FK-идентификаторы на справочники
+
     public int PriorityId { get; set; }
     public int StatusId { get; set; }
     public int CategoryId { get; set; }
 
-    // Навигационные свойства
+
     public PriorityLookup? PriorityRef { get; set; }
     public StatusLookup? StatusRef { get; set; }
     public CategoryLookup? CategoryRef { get; set; }
 
-    // Удобные обертки для совместимости со старым кодом
+
     [NotMapped]
     public TaskPriority Priority
     {

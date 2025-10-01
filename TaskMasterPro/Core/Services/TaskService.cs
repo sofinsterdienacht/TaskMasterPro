@@ -29,14 +29,15 @@ public class TaskService : ITaskService
 
     public async Task<TaskItem> CreateTaskAsync(TaskItem task)
     {
-        // Валидация
+
+
         if (string.IsNullOrWhiteSpace(task.Title))
             throw new ArgumentException("Название задачи не может быть пустым");
 
-        // Автоматическое определение приоритета
+
         task.Priority = DeterminePriority(task.Title);
-        
-        // Автоматическое определение категории
+
+
         task.Category = DetermineCategory(task.Title);
 
         return await _taskRepository.AddAsync(task);

@@ -38,8 +38,8 @@ namespace TaskMasterPro.WPF.ViewModels
             AddTaskCommand = new RelayCommand(async () => await AddTaskAsync());
             DeleteTaskCommand = new RelayCommand(async () => await DeleteTaskAsync());
             StatisticsCommand = new RelayCommand(async () => await ShowStatisticsAsync());
-            
-            // Загружаем задачи и категории при запуске
+
+
             _ = InitializeAsync();
         }
 
@@ -98,10 +98,11 @@ namespace TaskMasterPro.WPF.ViewModels
             IsLoading = true;
             try
             {
-                // Загружаем категории и приоритеты
+
+
                 await LoadCategoriesAndPrioritiesAsync();
-                
-                // Загружаем задачи
+
+
                 await LoadTasksAsync();
             }
             catch (Exception ex)
@@ -128,8 +129,8 @@ namespace TaskMasterPro.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                
-                // Устанавливаем значения по умолчанию из перечислений
+
+
                 AvailableCategories = Enum.GetNames(typeof(TaskCategory)).ToList();
                 AvailablePriorities = Enum.GetNames(typeof(TaskPriority)).ToList();
             }
@@ -171,8 +172,8 @@ namespace TaskMasterPro.WPF.ViewModels
                     "Введите описание задачи:",
                     "Описание задачи",
                     "Описание задачи");
-                
-                // Пытаемся автоматически определить категорию по ключевым словам
+
+
                 string selectedCategory;
                 try
                 {
@@ -189,7 +190,8 @@ namespace TaskMasterPro.WPF.ViewModels
                     }
                     else
                     {
-                        // Выбор категории из выпадающего списка
+
+
                         var dialog = new CategorySelectDialog(AvailableCategories);
                         var owner = Application.Current?.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
                         if (owner != null) dialog.Owner = owner;
@@ -211,8 +213,8 @@ namespace TaskMasterPro.WPF.ViewModels
                         ? dialog.SelectedCategory!
                         : (AvailableCategories.FirstOrDefault() ?? "Personal");
                 }
-                
-                // Приоритет не спрашиваем у пользователя: backend определит по ключевым словам; локально ставим Medium
+
+
                 var selectedPriority = "Medium";
                 
                 
@@ -315,7 +317,7 @@ namespace TaskMasterPro.WPF.ViewModels
         }
     }
 
-    // Простая реализация ICommand
+
     public class RelayCommand : ICommand
     {
         private readonly Func<Task> _execute;

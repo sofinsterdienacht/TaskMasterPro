@@ -24,11 +24,11 @@ namespace TaskMasterPro.WPF.Services
             _httpClient = new HttpClient();
         }
 
-        
 
-        /// <summary>
-        /// Получает все доступные категории задач
-        /// </summary>
+
+
+
+
         public async Task<Dictionary<string, string[]>> GetAllCategoriesAsync()
         {
             try
@@ -60,9 +60,11 @@ namespace TaskMasterPro.WPF.Services
             }
         }
 
-        /// <summary>
-        /// Получает все доступные приоритеты задач
-        /// </summary>
+
+
+
+
+
         public async Task<Dictionary<string, string[]>> GetAllPrioritiesAsync()
         {
             try
@@ -95,9 +97,11 @@ namespace TaskMasterPro.WPF.Services
             }
         }
 
-        /// <summary>
-        /// Получает все значения перечислений (категории, приоритеты, статусы)
-        /// </summary>
+
+
+
+
+
         public async Task<EnumValues> GetAllEnumValuesAsync()
         {
             try
